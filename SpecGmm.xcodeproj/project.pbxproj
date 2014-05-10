@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A3CD3F7191D699A00554F9E /* D3Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A3CD3F5191D699A00554F9E /* D3Matrix.cpp */; };
+		3A3CD3FA191DA49E00554F9E /* Test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A3CD3F8191DA49E00554F9E /* Test.cpp */; };
+		3A3CD3FD191DDDE900554F9E /* TesnsorPower.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3A3CD3FB191DDDE900554F9E /* TesnsorPower.cpp */; };
 		3AB535441916B76000D5344B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3AB535431916B76000D5344B /* main.cpp */; };
 		3AB535461916B76000D5344B /* SpecGmm.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3AB535451916B76000D5344B /* SpecGmm.1 */; };
 /* End PBXBuildFile section */
@@ -25,6 +28,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3A3CD3F5191D699A00554F9E /* D3Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = D3Matrix.cpp; sourceTree = "<group>"; };
+		3A3CD3F6191D699A00554F9E /* D3Matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = D3Matrix.h; sourceTree = "<group>"; };
+		3A3CD3F8191DA49E00554F9E /* Test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Test.cpp; sourceTree = "<group>"; };
+		3A3CD3F9191DA49E00554F9E /* Test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Test.h; sourceTree = "<group>"; };
+		3A3CD3FB191DDDE900554F9E /* TesnsorPower.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TesnsorPower.cpp; sourceTree = "<group>"; };
+		3A3CD3FC191DDDE900554F9E /* TesnsorPower.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TesnsorPower.h; sourceTree = "<group>"; };
 		3AB535401916B76000D5344B /* SpecGmm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SpecGmm; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AB535431916B76000D5344B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3AB535451916B76000D5344B /* SpecGmm.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SpecGmm.1; sourceTree = "<group>"; };
@@ -62,6 +71,12 @@
 			children = (
 				3AB535431916B76000D5344B /* main.cpp */,
 				3AB535451916B76000D5344B /* SpecGmm.1 */,
+				3A3CD3F5191D699A00554F9E /* D3Matrix.cpp */,
+				3A3CD3F6191D699A00554F9E /* D3Matrix.h */,
+				3A3CD3F8191DA49E00554F9E /* Test.cpp */,
+				3A3CD3F9191DA49E00554F9E /* Test.h */,
+				3A3CD3FB191DDDE900554F9E /* TesnsorPower.cpp */,
+				3A3CD3FC191DDDE900554F9E /* TesnsorPower.h */,
 			);
 			path = SpecGmm;
 			sourceTree = "<group>";
@@ -117,7 +132,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A3CD3FD191DDDE900554F9E /* TesnsorPower.cpp in Sources */,
+				3A3CD3FA191DA49E00554F9E /* Test.cpp in Sources */,
 				3AB535441916B76000D5344B /* main.cpp in Sources */,
+				3A3CD3F7191D699A00554F9E /* D3Matrix.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +213,12 @@
 		3AB5354A1916B76000D5344B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"/Users/hans/Box Documents/Research/eigenImpl/Eigen\"/**",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -202,6 +226,12 @@
 		3AB5354B1916B76000D5344B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"/Users/hans/Box Documents/Research/eigenImpl/Eigen\"/**",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -225,6 +255,7 @@
 				3AB5354B1916B76000D5344B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
