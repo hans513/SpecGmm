@@ -18,7 +18,8 @@
 using namespace Eigen;
 using namespace std;
 
-template<typename Derived> class D3Matrix {
+template<typename Derived>
+class D3Matrix {
     
 public:
     
@@ -38,9 +39,9 @@ public:
         
     }
     
-    MatrixXd getLayer(unsigned layer){
+    MatrixXd getLayer(unsigned long layer) const {
         if (layer>=nLayer) {
-            cout << "D3<Matrix getLayer error  layer="<<layer<< "  max layer=" << nLayer << endl;
+            cout << "\nD3<Matrix getLayer error  layer="<<layer<< "  max layer=" << nLayer << endl;
             MatrixXd zero = MatrixXd::Zero(nRow,nCol);
             return zero;
         }
@@ -48,27 +49,30 @@ public:
     };
     
     
-    bool setLayer(unsigned layer, MatrixBase<Derived> &matrix){
+    bool setLayer(unsigned long layer, MatrixBase<Derived> &matrix){
         if (layer>=nLayer) return false;
         layerPtr[layer] = matrix;
         return true;
     };
     
-    long rows() {return nRow;}
-    long cols() {return nCol;}
-    long layers() {return nLayer;}
+    long rows() const {return nRow;}
+    long cols() const {return nCol;}
+    long layers() const {return nLayer;}
     
     void check(){
         cout<<"Good";
     };
     
     void print() {
-        for (long i=0; i<nLayer; i++) cout << "D3Matrix layer"<< i << "=>\n"<< layerPtr[i] ;
+        for (long i=0; i<nLayer; i++) {
+            MatrixXd temp =layerPtr[i];
+            cout << "D3Matrix layer"<< i << "=>\n"<<  temp <<endl;
+            
+        }
         cout << endl;
     }
 
 private:
-    
     // Array of MatrixXd
     MatrixXd *layerPtr;
     long nRow;
@@ -76,3 +80,46 @@ private:
     long nLayer;
    
 };
+
+template<typename Derived>
+D3Matrix<Derived> operator+(D3Matrix<Derived>  &lhs, const D3Matrix<Derived> &rhs) {
+    if (lhs.layers()!=rhs.layers() || lhs.rows()!=rhs.rows() || lhs.cols()!=rhs.cols()) {
+        cout << "D3Matrix, operator+ =>"<<" Dimension mismatch";
+    }
+    
+    for (int i=0; i<lhs.layers(); i++) {
+        MatrixXd temp = lhs.getLayer(i);
+        temp = temp + rhs.getLayer(i);
+        lhs.setLayer(i,temp);
+    }
+    
+    return lhs;
+}
+
+
+template<typename Derived>
+D3Matrix<Derived> operator-(D3Matrix<Derived>  &lhs, const D3Matrix<Derived> &rhs) {
+    if (lhs.layers()!=rhs.layers() || lhs.rows()!=rhs.rows() || lhs.cols()!=rhs.cols()) {
+        cout << "D3Matrix, operator+ =>"<<" Dimension mismatch";
+    }
+    
+    for (int i=0; i<lhs.layers(); i++) {
+        MatrixXd temp = lhs.getLayer(i);
+        temp = temp - rhs.getLayer(i);
+        lhs.setLayer(i,temp);
+    }
+    
+    return lhs;
+}
+
+template<typename Derived>
+D3Matrix<Derived> operator*(D3Matrix<Derived>  &lhs, double scalar) {
+    
+    for (int i=0; i<lhs.layers(); i++) {
+        MatrixXd temp = lhs.getLayer(i);
+        temp = temp.array()*scalar;
+        lhs.setLayer(i,temp);
+    }
+    
+    return lhs;
+}

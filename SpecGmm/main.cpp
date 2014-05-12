@@ -12,14 +12,28 @@
 #include <Eigen/KroneckerProduct>
 #include <Eigen/Core>
 
+#ifndef __SpecGmm__D3Matrix__
+#define __SpecGmm__D3Matrix__
 #include "D3Matrix.h"
-#include "test.h"
-//#include <Eigen/CXX11/Tensor>
+#endif /* defined(__SpecGmm__D3Matrix__) */
 
-using Eigen::MatrixXd;
+#ifndef __SpecGmm__Test__
+#define __SpecGmm__Test__
+#include "test.h"
+#endif /* defined(__SpecGmm__Test__) */
+
+#ifndef __SpecGmm__TesnsorPower__
+#define __SpecGmm__TesnsorPower__
+#include "TensorPower.h"
+#endif /* defined(__SpecGmm__TesnsorPower__) */
+
+#ifndef __SpecGmm__SpecGmm__
+#define __SpecGmm__SpecGmm__
+#include "SpecGmm.h"
+#endif /* defined(__SpecGmm__SpecGmm__) */
+
 using namespace std;
 using namespace Eigen;
-
 
 MatrixXd test(MatrixXd a, MatrixXd b);
 
@@ -33,8 +47,11 @@ template <typename Derived>
 void tFunction(const MatrixBase<Derived> &T, MatrixBase<Derived> &u, MatrixBase<Derived> &v, MatrixBase<Derived> &w);
 
 void testTFuction();
+void testTensorPower();
+void testOuter();
+void testSpecGmm();
 
-static const bool DBG = false;
+//const bool DBG = 0;
 
 int main(int argc, const char * argv[]) {
 
@@ -55,8 +72,10 @@ int main(int argc, const char * argv[]) {
     //t(0, 1, 2, 3) = 42.0;
     
     //test2(a, b);
-        testTFuction();
-    
+    //TensorPower::testTFuction();
+    //testTensorPower();
+    //testOuter();
+    testSpecGmm();
     //Test t;
     
     
@@ -85,89 +104,8 @@ void test2(const MatrixBase<Derived> &input, MatrixBase<Derived> &output) {
 }
 
 
-template <typename Derived>
-void outer(const MatrixBase<Derived> &a, MatrixBase<Derived> &b) {
-    
-    MatrixXd m = kroneckerProduct(a,b).eval();
-    
-    cout <<"OuterProduct" << m << " size " << m.size() << endl;
-    m.resize(3,3);
-    
-    cout <<"OuterProduct" << m << endl;
-    
-    MatrixXf aa;
-    //test2(m, aa);
-    //cout << "Cool" << aa << endl;
-}
 
-
-
-/*
- function [theta, lambda, deflate]=tensorPower(T,L,N)
-
-*/
-
-
-
-template <typename Derived>
-MatrixXd tFunction(D3Matrix<Derived> &T, MatrixBase<Derived> &u, MatrixBase<Derived> &v, MatrixBase<Derived> &w) {
-    
-    // the length of the tensor
-    const long dim = T.rows();
-    
-    if (u.rows()!= dim || v.rows()!=dim || w.rows()!=dim) {
-        cout << "ERROR: tFunction: the dimension of input matrices are not correspondent to the Tensor" << endl;
-        MatrixXd zero = MatrixXd::Zero(1,1);
-        return zero;
-    }
-    
-    const long s1 = u.cols(), s2 = v.cols(),  s3 = w.cols();
-    
-    D3Matrix<Derived> ret = D3Matrix<Derived>(s1, s2, s3);
-    D3Matrix<Derived> temp = D3Matrix<Derived>(s1, s2, dim);
-    
-    /**
-     % Treat the 3D tesor as lots of layer of 2D Matrix
-     % In 2 dimension space => A(V1,V2) = V1'*A*V2
-     % So it's just like deal with T(u,v) at layer j3
-     */
-    for (int j3=0; j3<dim; j3++) {
-
-        MatrixXd a = u.transpose() * T.getLayer(j3) * v;
-        temp.setLayer(j3,a);
-
-        // For each column vectoer in w (usually there is only one cloumn)
-        for (int wInd=0; wInd<s3; wInd++) {
-
-            /**
-             % A(V1,V2) at layer j3 * w(j3)
-             % and the sum of every layer is the answer
-             */
-            MatrixXd b = ret.getLayer(wInd) + temp.getLayer(j3) * w(j3,wInd);
-            ret.setLayer(wInd, b);
-        }
-    }
-
-    // Debug
-    if (DBG) for (int i=0; i<ret.layers(); i++) {
-        cout << "RESULT layer "<< i <<" \n" <<ret.getLayer(i);
-    }
-    
-    if (ret.layers() != 1) {
-        cout << "tFunction Error!!  We can't handle returning 3D matrix yet" << endl;
-        cout << "In this algorithm, we should return only 1 layer!!" << endl;
-    }
-
-    return ret.getLayer(0);
-
-}
-
-void testTFuction() {
-    
-    MatrixXd u = MatrixXd::Identity(3,3);
-    MatrixXd v = MatrixXd::Identity(3,3);
-    MatrixXd w(3,1);
-    w << 1,1,1;
+void testTensorPower() {
     
     MatrixXd t1(3,3);
     MatrixXd t2(3,3);
@@ -175,95 +113,48 @@ void testTFuction() {
     t1 << 1,2,3,4,5,6,7,8,9;
     t2 << 10,11,12,13,14,15,16,17,18;
     t3 << 19,20,21,22,23,24,25,26,27;
-
+    
     D3Matrix<MatrixXd> T(3,3,3);
     T.setLayer(0, t1);
     T.setLayer(1, t2);
     T.setLayer(2, t3);
-
-    MatrixXd result = tFunction(T,u,v,w);
     
-    MatrixXd solution(3,3);
-    solution << 30,33,36,39,42,45,48,51,54;
+    TensorPower<MatrixXd> power(T, 10, 10);
+    //power.compute(T, 10, 10);
+    //cout<< "ans" << power.theta() << endl;
     
-    cout << "===== TEST CASE RESULT : TFunction ===== " << endl;
-    cout << "Test error should be a zero matrix" << endl;
-    cout << "test error = " << endl << solution-result << endl ;
+    MatrixXd solution(3,1);
+    solution << 0.458361, 0.570097, 0.681832;
+    
+    cout << "===== TEST CASE RESULT : TensorPower ===== " << endl;
+    cout << "Test error should be nearly zero" << endl;
+    cout << "test error = " << endl << power.theta()-solution << endl ;
+    
 }
 
-
-template <typename Derived> class TensorPower {
+void testSpecGmm() {
+    MatrixXd X(4,20);
+    // Center =
+    //5.5599    7.0493
+    //7.4210    2.9892
+    //0.7244    4.7072
+    //3.6730    4.3834
+    X << 5.7896,5.6359,5.5301,5.5245,5.0695,5.8445,5.2919,5.6945,5.9686,5.2731
+        ,6.8700,6.7659,7.1758,6.3803,7.0528,7.3412,7.0229,7.4555,6.9957,7.3049,
+        7.1263,7.9713,7.1027,6.5886,7.5687,7.3943,7.7713,7.2862,7.5625,7.1713
+        ,2.7254,2.9215,2.5417,2.9199,2.7602,3.2831,2.6862,2.9441,2.7830,2.9657,
+        0.5780,0.8247,0.6257,1.1336,0.6533,0.6168,1.1998,0.4550,0.5137,0.3889
+        ,4.9361,4.3415,5.3407,4.4333,5.0126,4.9296,4.7340,4.4581,4.5895,5.0449,
+        3.3472,3.7278,4.0639,3.7934,3.4680,3.3921,3.7881,4.1433,3.3441,3.9458
+        ,4.4003,4.0163,4.4981,3.9663,4.5073,3.7697,3.9186,4.2988,3.9143,4.7658;
     
-    public:
-        TensorPower(MatrixBase<Derived> &T, int L, int N) {
 
-
-        /*vvvvvvvv
-         if size(T,1)~=size(T,2) || size(T,1)~=size(T,3)
-         disp('ERROR')
-         return;
-         end
-         */
-            if (T.rows()!=T.cols() /* || T.row()!=  */) {
-                return;
-            }
-            
-           
-         //k = size(T,1); vvvvvvvv
-            const unsigned int k = T.row();
-            
-            
-            
-            /*
-         theta = zeros(k, L, N+1);
-         for tau=1:L
-         
-         theta_0 = randn(k,1);
-         theta(:, tau, 1) = theta_0/norm(theta_0);
-         */
-            
-            
-            
-            /*
-         for t=2:N+1
-         preTheta = theta(:, tau, t-1);
-         tensorTheta = TFunction(T, eye(k), preTheta, preTheta);
-         theta(:, tau, t) = tensorTheta / norm(tensorTheta);
-         end
-        
-             
-             
-             
-             end
-         
-         
-         for tau=1:L
-         
-         cur = theta(:, tau, N+1);
-         lambdaBuf(tau) = TFunction(T, cur, cur, cur);
-         
-         end
-         
-         [~, maxTau] = max(lambdaBuf);
-         best = theta(:, maxTau, N+1);
-         
-         for i=2:N+1
-         best(:,1) = TFunction(T, eye(k), best, best) / norm(TFunction(T, eye(k), best, best));
-         end
-         
-         lambda = TFunction(T, best, best, best);
-         
-         deflate = T - lambda * outerProduct(outerProduct(best, best),best);
-         theta = best;
-             
-        */
-            
-        }
+    SpecGmm test(X, 2);
     
-    protected:
-        MatrixBase<Derived> theta;
-        float* lambda;
-        MatrixBase<Derived> deflate;
-};
+}
 
+/*
+ function [theta, lambda, deflate]=tensorPower(T,L,N)
+
+*/
 
