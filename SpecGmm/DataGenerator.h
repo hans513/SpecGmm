@@ -20,8 +20,6 @@ class DataGenerator {
     
 public:
     
-    // SyntheticGmmGeneratorN(nDimension, nGaussian, nDataPerGaussian, noise, unitRadius)
-
     DataGenerator(unsigned long nDimension, unsigned long nGaussian, unsigned long nDataPerGaussian, double noise, double unitRadius)
         : mDimension(nDimension),
             mGaussian(nGaussian),
@@ -32,54 +30,25 @@ public:
             };
 
     void initialize() {
-/*
-        center = rand(nGaussian, nDimension);
-        for i=1:nGaussian
-            center(i,:) = center(i,:)/norm(center(i,:))*unitRadius;
-        end
-  */
-        
+
         mCenters = MatrixXd::Random(mDimension, mGaussian);
 
-        // MatrixXd::Random(rows,cols)         // rand(rows,cols)*2-1
-        
         for (int i=0; i<mGaussian; i++) {
-            //MatrixXd temp = centers.col(i)/centers.col(i).norm();
-            //temp *= mUnitRadius;
             mCenters.col(i) = mCenters.col(i)/mCenters.col(i).norm();
             mCenters.col(i) *= mUnitRadius;
         }
-
-        //cout << centers;
-        
-        /*
-        X=zeros(nDataPerGaussian*nGaussian,nDimension);
-        SIGMA = noise*eye(nDimension);
-        
-        currentInd = 0;
-        for i=1:nGaussian
-            X(currentInd+1:currentInd+nDataPerGaussian,:) = [mvnrnd(center(i,:), SIGMA, nDataPerGaussian)];
-        currentInd = currentInd + nDataPerGaussian;
-        end
-        
-        X=X';
-        center = center';
-*/
         
         mX = MatrixXd::Zero(mDimension, mDataPerGaussian*mGaussian);
         
         random_device rd;
         default_random_engine generator(rd());
-//        generator.seed(srand(time(NULL)));
 
         for (unsigned long cluster=0; cluster<mGaussian; cluster++) {
             
             unsigned long margin = cluster * mDataPerGaussian;
             
             VectorXd currentCenter = mCenters.col(cluster);
-            //normal_distribution<double> *normal = new normal_distribution<double>[mDimension];
             vector<normal_distribution<double>> normalVec;
-            
             
             for (unsigned long dimension=0; dimension<mDimension; dimension ++) {
                 normalVec.push_back(normal_distribution<double>(currentCenter(dimension), mNoise));
@@ -90,10 +59,7 @@ public:
                     mX(dim, margin+index) = normalVec.at(dim)(generator);
                 }
             }
-            
-    
         }
-        
     }
     
     MatrixXd X() {
@@ -151,22 +117,15 @@ public:
             MatrixXd diff = finalEstimate - currentRep;
             diff = diff.array().pow(2);
             VectorXd dist = diff.colwise().sum();
-            //s = R.minCoeff(&r, &c)    // [s, i] = min(R(:)); [r, c] = ind2sub(size(R), i);
-            
+
             MatrixXf::Index minRow, minCol;
             error += pow(dist.minCoeff(&minRow, &minCol),0.5);
-            //cout << "error:" << error << "  col:" << minCol <<"  row:"<<minRow<< endl;
             bestMatch.col(i) = finalEstimate.col(minRow);
-            
-        /*
-         MatrixXf::Index minRow, minCol;
-         float min = m.minCoeff(&minRow, &minCol);
-         */
         }
         
-        cout << endl <<"Best match" << endl;
+        cout << endl <<" ===== Best match ===== " << endl;
         cout << bestMatch << endl;
-        cout << "Original" << endl;
+        cout << " ===== Original ===== " << endl;
         cout << mCenters << endl;
         cout << endl << "avg RMSE=" << error/mGaussian << endl;
     }

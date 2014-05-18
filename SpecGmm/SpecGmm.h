@@ -70,8 +70,8 @@ public:
         if (DBG) cout << "U:" << endl << U << endl;
         if (DBG) cout << "D:" << endl << validD << endl;
         if (DBG) cout << "S:" << endl << S << endl;
-        if (DBG)cout<< endl << endl;
-        if (DBG) cout<< "W" << endl << W;
+        if (DBG) cout << endl << endl;
+        if (DBG) cout << "W" << endl << W;
 
         int64 t2 = GetTimeMs64();
         if (TIME_MEASURE) cout << "Time: SVD decompostion=" << (t2-t1)<< endl;
@@ -79,11 +79,9 @@ public:
         
         D3Matrix<MatrixXd> EWtX3(K,K,K);
         for (int i=0; i<nData; i++) {
-            //VectorXd curX = X.col(i);
-            //MatrixXd temp = W.transpose()*curX;
             MatrixXd temp = W.transpose() * X.col(i);
             MatrixXd temp2 = outer(temp,temp)->getLayer(0);
-            EWtX3 = EWtX3 + *outer(temp2, temp);
+            EWtX3 += *outer(temp2, temp);
         }
 
         int64 t3 = GetTimeMs64();
@@ -100,7 +98,6 @@ public:
         if (DBG) cout<< "EWtX3" << endl;
         if (DBG) EWtX3.print();
         
-        // EWtX = sum(W'*X,2)/nData;
         MatrixXd EWtX = (W.transpose()*X).rowwise().sum().array() / nData;
       
         if (DBG) cout<< endl << endl;
@@ -116,14 +113,13 @@ public:
             MatrixXd temp1 = outer(EWtX,  WtEi)->getLayer(0);
             MatrixXd temp2 = outer(WtEi, EWtX)->getLayer(0);
             MatrixXd temp3 = outer(WtEi, WtEi)->getLayer(0);
-            sigTensor = sigTensor + *outer(temp1, WtEi);
-            sigTensor = sigTensor + *outer(temp2, WtEi);
-            sigTensor = sigTensor + *outer(temp3, EWtX);
+            sigTensor +=   *outer(temp1, WtEi);
+            sigTensor +=   *outer(temp2, WtEi);
+            sigTensor +=   *outer(temp3, EWtX);
         }
   
         sigTensor = sigTensor*sigma;
 
-        
         if (DBG) cout<< endl << endl;
         if (DBG) cout<< "sigTensor" << endl;
         if (DBG) sigTensor.print();
@@ -133,7 +129,6 @@ public:
         if (DBG) cout<< endl << endl;
         if (DBG) T.print();
 
-        
         int64 t4 = GetTimeMs64();
         if (TIME_MEASURE) cout << "Time: Tensor calculation=" << (t4-t3)<< endl;
         

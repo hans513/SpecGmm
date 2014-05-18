@@ -68,6 +68,20 @@ public:
         }
         cout << endl;
     }
+    
+    
+    D3Matrix& operator+=(const D3Matrix &rhs) {
+        if (nLayer!=rhs.layers() || nRow!=rhs.rows() || nCol!=rhs.cols()) {
+            cout << "D3Matrix, operator+ =>"<<" Dimension mismatch";
+        }
+        
+        for (int i=0; i<nLayer; i++) {
+            layerPtr[i] += rhs.getLayer(i);
+        }
+        
+        return *this;
+    }
+    
 
 private:
     // Array of MatrixXd
@@ -85,9 +99,11 @@ D3Matrix<Derived> operator+(D3Matrix<Derived>  &lhs, const D3Matrix<Derived> &rh
     }
     
     for (int i=0; i<lhs.layers(); i++) {
+        
         MatrixXd temp = lhs.getLayer(i);
         temp = temp + rhs.getLayer(i);
         lhs.setLayer(i,temp);
+        
     }
     
     return lhs;
