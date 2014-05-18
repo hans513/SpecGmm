@@ -23,11 +23,8 @@ class D3Matrix {
     
 public:
     
-    D3Matrix(long row, long col, long layer) {
+    D3Matrix(long row, long col, long layer) : nRow(row), nCol(col), nLayer(layer) {
 
-        nRow = row;
-        nCol = col;
-        nLayer = layer;
         layerPtr = new MatrixXd[nLayer];
         
         for (long i=0; i<nLayer; i++) {

@@ -15,23 +15,18 @@
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 
-
 #endif
 
 
 #ifndef __SpecGmm__D3Matrix__
-#define __SpecGmm__D3Matrix__
 #include "D3Matrix.h"
 #endif /* defined(__SpecGmm__D3Matrix__) */
 
 #ifndef __SpecGmm__Test__
-#define __SpecGmm__Test__
 #include "test.h"
 #endif /* defined(__SpecGmm__Test__) */
 
-
 #ifndef __SpecGmm__TesnsorPower__
-#define __SpecGmm__TesnsorPower__
 #include "TensorPower.h"
 #endif /* defined(__SpecGmm__TesnsorPower__) */
 
@@ -41,64 +36,58 @@ using namespace Eigen;
 class SpecGmm {
     
 public:
+
+    static const bool DBG = false;
+    static const bool TIME_MEASURE = true;
     
-    void testOuter() {
+    void compute(MatrixXd X, unsigned long K){
+        mK = K;
         
-        MatrixXd t1(3,3);
-        MatrixXd t2(1,3);
-        
-        t1 << 1,2,3,4,5,6,7,8,9;
-        t2 << 1,2,3;
-        
-        outer(t1, t2);
-        
-        MatrixXd sol0(3,3);
-        MatrixXd sol1(3,3);
-        MatrixXd sol2(3,3);
-        sol0 << 1,4,7,2,8,14,3,12,21;
-        sol1 << 2,5,8,4,10,16,6,15,24;
-        sol2 << 3,6,9,6,12,18,9,18,27;
-        
-    }
-    
-    void compute(MatrixXd X, unsigned long K) {
+        int64 t0 = GetTimeMs64();
         
         unsigned long nData = X.cols();
         unsigned long nDimension = X.rows();
         
-        cout << "nData=" << nData << endl;
-        cout << "nDimension=" << nDimension << endl;
+        if (DBG) cout << "nData=" << nData << endl;
+        if (DBG) cout << "nDimension=" << nDimension << endl;
         
         MatrixXd C = X*X.transpose()/nData;
+
+        int64 t1 = GetTimeMs64();
+        if (TIME_MEASURE) cout << "Time: Matrix Multiplication=" << (t1-t0)<< endl;
         
         const JacobiSVD<MatrixXd> svd(C, ComputeThinU | ComputeThinV);
         MatrixXd U = svd.matrixU().leftCols(K);
         VectorXd S = svd.singularValues();
-        
         unsigned long nNoise = S.rows() - K;
-        
-        //MatrixXd sigmaD = D.tail(nNoise);
         double sigma = S.tail(nNoise).sum()/nNoise;
         VectorXd D = S.array() - sigma;
-        D = D.head(K).array().pow(-0.5);
-        MatrixXd W = U * D.asDiagonal();
+        // When matrix size change, we need another variable to store the result
+        VectorXd validD = D.head(K).array().pow(-0.5);
+        MatrixXd W = U * validD.asDiagonal();
         
-        
-        cout<< endl << endl;
-        cout<< "W" << endl << W;
+        if (DBG) cout << "Estimate sigma:" << sigma << endl;
+        if (DBG) cout << "U:" << endl << U << endl;
+        if (DBG) cout << "D:" << endl << validD << endl;
+        if (DBG) cout << "S:" << endl << S << endl;
+        if (DBG)cout<< endl << endl;
+        if (DBG) cout<< "W" << endl << W;
 
-      
+        int64 t2 = GetTimeMs64();
+        if (TIME_MEASURE) cout << "Time: SVD decompostion=" << (t2-t1)<< endl;
+        
+        
         D3Matrix<MatrixXd> EWtX3(K,K,K);
         for (int i=0; i<nData; i++) {
-            
-            VectorXd curX = X.col(i);
-            MatrixXd temp = W.transpose()*curX;
+            //VectorXd curX = X.col(i);
+            //MatrixXd temp = W.transpose()*curX;
+            MatrixXd temp = W.transpose() * X.col(i);
             MatrixXd temp2 = outer(temp,temp)->getLayer(0);
-            //D3Matrix<MatrixXd> temp3 = outer(temp2, temp);
             EWtX3 = EWtX3 + *outer(temp2, temp);
-            
-            //cout << "temp=" << temp << endl <<" temp2="<< temp2 << endl;
         }
+
+        int64 t3 = GetTimeMs64();
+        if (TIME_MEASURE) cout << "Time: Tensor forming=" << (t3-t2)<< endl;
         
         // EWtX3 = EWtX3/nData;
         for (int i=0; i<EWtX3.layers(); i++) {
@@ -107,24 +96,21 @@ public:
             EWtX3.setLayer(i, temp);
         }
         
-        cout<< endl << endl;
-        cout<< "EWtX3" << endl;
-        EWtX3.print();
+        if (DBG) cout<< endl << endl;
+        if (DBG) cout<< "EWtX3" << endl;
+        if (DBG) EWtX3.print();
         
         // EWtX = sum(W'*X,2)/nData;
         MatrixXd EWtX = (W.transpose()*X).rowwise().sum().array() / nData;
       
-        cout<< endl << endl;
-        cout<< "EWtX" << endl << EWtX;
+        if (DBG) cout<< endl << endl;
+        if (DBG) cout<< "EWtX" << endl << EWtX;
 
-        
         D3Matrix<MatrixXd> sigTensor(K,K,K);
-
+        
         for (int i=0; i<nDimension; i++){
             MatrixXd ei = MatrixXd::Zero(nDimension,1);
             ei(i,0) = 1;
-            
-            cout<< "ei=" << ei << endl;
             
             MatrixXd WtEi = W.transpose()*ei;
             MatrixXd temp1 = outer(EWtX,  WtEi)->getLayer(0);
@@ -134,35 +120,28 @@ public:
             sigTensor = sigTensor + *outer(temp2, WtEi);
             sigTensor = sigTensor + *outer(temp3, EWtX);
         }
-        
-        
-        // sigTensor = ESTIMATE_SIGMA*sigTensor;
-        /*
-        for (int i=0; i<sigTensor.layers(); i++) {
-            MatrixXd temp = sigTensor.getLayer(i);
-            temp = temp.array() * sigma;
-            sigTensor.setLayer(i, temp);
-        }*/
+  
         sigTensor = sigTensor*sigma;
 
-        cout<< endl << endl;
-        cout<< "sigTensor" << endl;
-        sigTensor.print();
+        
+        if (DBG) cout<< endl << endl;
+        if (DBG) cout<< "sigTensor" << endl;
+        if (DBG) sigTensor.print();
         
         D3Matrix<MatrixXd> T = EWtX3 - sigTensor;
         
-        cout<< endl << endl;
+        if (DBG) cout<< endl << endl;
+        if (DBG) T.print();
+
         
-        T.print();
+        int64 t4 = GetTimeMs64();
+        if (TIME_MEASURE) cout << "Time: Tensor calculation=" << (t4-t3)<< endl;
         
         tensorDecompose(T, W);
         
-        //MatrixXd
-        
-        //cout << "U=" << U << endl <<" D="<< D <<"  sigma="<< sigma << endl;
-        //cout << "W=" << W;
-        
-        
+        int64 t5 = GetTimeMs64();
+        if (TIME_MEASURE) cout << "Time: Tensor decompostion=" << (t5-t4)<< endl;
+      
     }
     
     SpecGmm(MatrixXd X, unsigned long K) {
@@ -171,36 +150,58 @@ public:
     
     template <typename Derived>
     void tensorDecompose(D3Matrix<Derived> T, MatrixXd W) {
-        
-        cout << endl << endl << endl;
-        
+
         vector<MatrixXd> theta;
         vector<double> lambda;
+        vector<MatrixXd> centers;
         
         while (lambda.size()==0  || abs(lambda.back())>0.01 ) {
             TensorPower<MatrixXd> current(T, 10, 10);
             T = *current.deflate();
             theta.push_back(current.theta());
             lambda.push_back(current.lambda());
+            //cout << endl <<"theta="<<endl<<current.theta();
+            //cout << endl <<"lambda="<<endl<<current.lambda();
             
-            cout << endl <<"theta="<<endl<<current.theta();
-            cout << endl <<"lambda="<<endl<<current.lambda();
-            
-            //mu(:,i) = lambda(i)*pinv(W')*theta(:,i);
+            // Recover the center
             const JacobiSVD<MatrixXd> pinvSvd(W.transpose(), ComputeThinU | ComputeThinV);
             MatrixXd invTemp;
             pinvSvd.pinv(invTemp);
             MatrixXd result = current.lambda()*invTemp*current.theta();
-            cout << endl <<"result="<<endl<<result;
-            cout << endl <<"check="<<W.transpose()*invTemp<<result;
-            cout << endl <<"lambda back="<<lambda.back();
+            centers.push_back(result);
         }
         
+        // Print out the result
+        MatrixXd centerMatrix(W.rows(), lambda.size());
+        cout << endl <<"TensorDecompose result =" << endl;
+        cout << "lambda =" << endl << "\t";
+        mWeight.clear();
+        for (int i=0; i<centers.size(); i++) {
+            centerMatrix.col(i) = centers.at(i).col(0);
+            cout << pow(lambda.at(i),-2) <<"\t";
+            mWeight.push_back(pow(lambda.at(i),-2));
+        }
+        cout << endl <<"centers ="<<endl<< centerMatrix << endl;
+        mCenters = centerMatrix;
     }
 
-
+    MatrixXd centers() {
+        
+        
+        if (mK >= mCenters.cols()) return mCenters;
+        
+        return  mCenters.leftCols(mK);
+        
+        //cout << endl <<"mK =" << mK << endl;
+        //cout << endl <<"mCenters col =" << mCenters.cols() << endl;
+        //return mCenters.leftCols(mK);
+    }
+    
 private:
     MatrixXd bestTheta;
     double bestLambda;
     MatrixXd deflate;
+    MatrixXd mCenters;
+    unsigned long mK;
+    vector<double> mWeight;
 };

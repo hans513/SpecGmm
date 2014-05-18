@@ -15,12 +15,10 @@
 
 
 #ifndef __SpecGmm__D3Matrix__
-#define __SpecGmm__D3Matrix__
 #include "D3Matrix.h"
 #endif /* defined(__SpecGmm__D3Matrix__) */
 
 #ifndef __SpecGmm__Test__
-#define __SpecGmm__Test__
 #include "test.h"
 #endif /* defined(__SpecGmm__Test__) */
 
@@ -115,12 +113,7 @@ public:
         cout << "test error = " << endl << solution-result << endl ;
     }
     
-    
-    D3Matrix<Derived> outerProduct(MatrixBase<Derived> &A, MatrixBase<Derived> &B) {
-        
-        
-    }
-    
+   
     void compute (D3Matrix<Derived> &T, int L, int N) {
         
         /*vvvvvvvv

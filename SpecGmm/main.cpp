@@ -7,10 +7,11 @@
 //
 
 #include <iostream>
+#include <random>
 #include <Eigen/Dense>
 #include <Eigen/SVD>
-#include <Eigen/KroneckerProduct>
 #include <Eigen/Core>
+#include <Eigen/KroneckerProduct>
 
 #ifndef __SpecGmm__D3Matrix__
 #define __SpecGmm__D3Matrix__
@@ -18,74 +19,60 @@
 #endif /* defined(__SpecGmm__D3Matrix__) */
 
 #ifndef __SpecGmm__Test__
-#define __SpecGmm__Test__
 #include "test.h"
 #endif /* defined(__SpecGmm__Test__) */
 
 #ifndef __SpecGmm__TesnsorPower__
-#define __SpecGmm__TesnsorPower__
 #include "TensorPower.h"
 #endif /* defined(__SpecGmm__TesnsorPower__) */
 
 #ifndef __SpecGmm__SpecGmm__
-#define __SpecGmm__SpecGmm__
 #include "SpecGmm.h"
 #endif /* defined(__SpecGmm__SpecGmm__) */
+
+#ifndef SpecGmm_DataGenerator_h
+#include "DataGenerator.h"
+#endif
 
 using namespace std;
 using namespace Eigen;
 
-MatrixXd test(MatrixXd a, MatrixXd b);
-
 template <typename Derived>
 void test2(const MatrixBase<Derived> &input, MatrixBase<Derived> &output);
 
-template <typename Derived>
-void outer(const MatrixBase<Derived> &a, MatrixBase<Derived> &b);
-
-template <typename Derived>
-void tFunction(const MatrixBase<Derived> &T, MatrixBase<Derived> &u, MatrixBase<Derived> &v, MatrixBase<Derived> &w);
-
 void testTFuction();
 void testTensorPower();
-void testOuter();
 void testSpecGmm();
-
-//const bool DBG = 0;
+void testRandom();
 
 int main(int argc, const char * argv[]) {
 
-    // insert code here...
-    //MatrixXf m(2,2);
-    //m(0,0) = 3;
-    //m(1,0) = 2.5;
-    //m(0,1) = -1;
-    //m(1,1) = m(1,0) + m(0,1);
-    
-    Eigen::MatrixXf a(3,1);
-    a << 1, 2, 3;
-    
-    Eigen::MatrixXf b(3,1);
-    b<< 4, 5, 6;
-  
-    //Eigen::Tensor<double, 4> t(10, 10, 10, 10);
-    //t(0, 1, 2, 3) = 42.0;
-    
-    //test2(a, b);
     //TensorPower::testTFuction();
     //testTensorPower();
     //testOuter();
     testSpecGmm();
-    //Test t;
-    
+    //testRandom();
     
     return 0;
 }
 
-MatrixXd test(MatrixXd a, MatrixXd b) {
-    return a+b;
+void testRandom() {
+    // mean std
+    
+    /*
+    normal_distribution<double> normal(3.0, 4.0);
+    default_random_engine generator;
+    generator.seed(1000);
+    cout << normal(generator) << endl;
+     cout << normal(generator) << endl;
+     cout << normal(generator) << endl;
+     */
+    //DataGenerator test(5,3,10,0.1,10);
+    //cout << test.X();
 }
 
+
+// SVD Example
 template <typename Derived>
 void test2(const MatrixBase<Derived> &input, MatrixBase<Derived> &output) {
     
@@ -102,8 +89,6 @@ void test2(const MatrixBase<Derived> &input, MatrixBase<Derived> &output) {
     output=svd.matrixU();
 
 }
-
-
 
 void testTensorPower() {
     
@@ -133,12 +118,12 @@ void testTensorPower() {
 }
 
 void testSpecGmm() {
-    MatrixXd X(4,20);
     // Center =
     //5.5599    7.0493
     //7.4210    2.9892
     //0.7244    4.7072
     //3.6730    4.3834
+    MatrixXd X(4,20);
     X << 5.7896,5.6359,5.5301,5.5245,5.0695,5.8445,5.2919,5.6945,5.9686,5.2731
         ,6.8700,6.7659,7.1758,6.3803,7.0528,7.3412,7.0229,7.4555,6.9957,7.3049,
         7.1263,7.9713,7.1027,6.5886,7.5687,7.3943,7.7713,7.2862,7.5625,7.1713
@@ -149,12 +134,53 @@ void testSpecGmm() {
         ,4.4003,4.0163,4.4981,3.9663,4.5073,3.7697,3.9186,4.2988,3.9143,4.7658;
     
 
-    SpecGmm test(X, 2);
+    /**
+    Center =
+    6.5445    3.1597    1.8806
+    4.4010    6.9023    3.2828
+    4.3265    0.2085    4.7405
+    4.0927    5.8968    5.3529
+    1.5270    2.7491    5.8788
+    */
+    MatrixXd Y(5,30);
+    Y << 6.2927,6.5660,6.2210,6.4903,6.6331,6.5048,6.4256,6.2634,6.5338,6.8035,
+    3.4894,3.3732,3.1784,3.2992,2.9455,3.4549,2.5877,3.2452,3.3003,2.9435,2.5123,
+    1.6103,1.7337,1.7756,1.3176,2.2257,1.4583,1.9476,1.5875,1.7245,
+    4.9342,4.0187,4.1915,4.5295,4.3297,4.2107,4.7183,4.7614,4.4910,4.3328,7.1378,
+    7.4547,6.8908,6.6993,7.2232,7.5199,6.6356,6.6785,6.9969,6.8513,3.6953,3.1425,
+    3.7438,3.4817,3.3844,3.6345,3.6526,3.5146,3.7795,2.9550,
+    5.0358,4.0134,4.5307,4.0849,4.1098,4.3846,4.2170,4.5567,4.1470,4.2717,0.4247,
+    0.7256,0.0022,0.6104,0.9517,0.3202,0.3222,0.0822,0.0413,0.5754,5.1657,5.2033,
+    4.4487,4.8632,4.2583,3.8923,4.7593,4.9443,4.6721,4.1768,
+    4.2165,4.1169,4.4406,3.7166,4.2819,3.6317,4.1789,4.3707,4.4039,3.9090,5.8345,
+    5.8985,5.5333,6.1905,5.8443,6.2548,5.9095,6.1363,5.6464,6.1243,5.5234,5.5585,
+    5.5840,5.2372,4.8715,5.2481,5.6063,4.8724,5.5533,5.1258,
+    1.2900,1.1129,1.3845,1.5063,1.0579,1.4099,1.5899,1.8939,1.5669,1.5464,2.8398,
+    3.0675,2.6226,2.5526,3.0347,3.1389,3.0805,2.6282,2.6482,2.8601,5.6453,5.6529,
+    6.0796,5.6192,6.0094,6.5443,6.1125,6.1944,6.0349,5.7927;
     
+    
+    int nDimension = 50;
+    int nGaussian =10;
+    int nDataPerGaussian =1000;
+    double noise =10; //variance
+    double unitRadius =10;
+    
+    int64 stamp1 = GetTimeMs64();
+    DataGenerator data(nDimension, nGaussian, nDataPerGaussian, pow(noise,0.5), unitRadius);
+    
+    int64 stamp2 = GetTimeMs64();
+    
+    SpecGmm test(data.X(), nGaussian);
+    int64 stamp3 = GetTimeMs64();
+    
+    data.evaluate(test.centers());
+    int64 stamp4 = GetTimeMs64();
+    
+    cout << endl;
+    cout << "time1=" << (stamp2-stamp1)<< endl;
+    cout << "time2=" << (stamp3-stamp2)<< endl;
+    cout << "time3=" << (stamp4-stamp3)<< endl;
+//    cout << "time4" << (stamp2-stamp1)<< endl;
 }
-
-/*
- function [theta, lambda, deflate]=tensorPower(T,L,N)
-
-*/
 
