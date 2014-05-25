@@ -12,9 +12,9 @@
 #include <Eigen/SVD>
 #include <Eigen/Core>
 #include <Eigen/KroneckerProduct>
+#include <spiral_wht.h>
 
 #ifndef __SpecGmm__D3Matrix__
-#define __SpecGmm__D3Matrix__
 #include "D3Matrix.h"
 #endif /* defined(__SpecGmm__D3Matrix__) */
 
@@ -34,24 +34,73 @@
 #include "DataGenerator.h"
 #endif
 
+#ifndef __SpecGmm__Fastfood__
+#include "Fastfood.h"
+#endif /* defined(__SpecGmm__Fastfood__) */
+
 using namespace std;
 using namespace Eigen;
 
 template <typename Derived>
-void test2(const MatrixBase<Derived> &input, MatrixBase<Derived> &output);
+void svdExample(const MatrixBase<Derived> &input, MatrixBase<Derived> &output);
 
 void testTFuction();
 void testTensorPower();
 void testSpecGmm();
 void testRandom();
+void specGmmExp();
+
+void test() {
+    
+}
+
+//  Test case for FastfoodRangeFinder
+void test_FastfoodRangeFinder() {
+    unsigned ndimension = 18;
+    unsigned nbasis = 6;
+    unsigned ndataPoints = 40;
+
+    // Random basis
+    MatrixXd basis = MatrixXd::Random(ndimension, nbasis);
+
+    // nDimension * nDataPoints (rank=nBasis)
+    MatrixXd span = basis * MatrixXd::Random(nbasis, ndataPoints);
+    
+    FastfoodRangeFinder ffFinder(span, nbasis);
+    
+    unsigned rankDiff = 0;
+    
+    // Check if all the column vectors in the matrix q we got are linear dependent
+    // with the Basis we have above.
+    for (int i=0; i<nbasis; i++) {
+        MatrixXd test(ndimension, nbasis+1);
+        test << ffFinder.Q(), basis.col(i);
+        
+        FullPivLU<MatrixXd> lu(test);
+        lu.setThreshold(pow(10,-10));
+        rankDiff += (lu.rank()-nbasis);
+            cout << endl << "threshold:" << lu.threshold() << endl;
+    }
+    
+    cout << endl << "Rank diff:" << rankDiff << endl;
+}
 
 int main(int argc, const char * argv[]) {
 
     //TensorPower::testTFuction();
     //testTensorPower();
     //testOuter();
-    testSpecGmm();
+  
     //testRandom();
+ 
+    //test();
+   // Fastfood::test();
+    
+    
+  //testSpecGmm();
+    //specGmmExp();
+    //testHadamardGen();
+    test_FastfoodRangeFinder();
     
     return 0;
 }
@@ -74,7 +123,7 @@ void testRandom() {
 
 // SVD Example
 template <typename Derived>
-void test2(const MatrixBase<Derived> &input, MatrixBase<Derived> &output) {
+void svdExample(const MatrixBase<Derived> &input, MatrixBase<Derived> &output) {
     
     MatrixXf m = MatrixXf::Random(3,2);
     cout << "Here is the matrix m:" << endl << m << endl;
@@ -119,12 +168,12 @@ void testTensorPower() {
 
 
 
-void evaluate(MatrixXd centers, MatrixXd estimate) {
+double evaluate(MatrixXd centers, MatrixXd estimate) {
     
     if (estimate.rows()!=centers.rows()) {
         cout << endl <<"ERROR:DataGenerator evaluate"<< endl;
         cout << "resultEvaluation dimension mismatch "<< endl;
-        return;
+        return 0;
     }
     
     unsigned long dimension = centers.rows();
@@ -163,6 +212,8 @@ void evaluate(MatrixXd centers, MatrixXd estimate) {
     cout << " ===== Original ===== " << endl;
     cout << centers << endl;
     cout << endl << "avg RMSE=" << error/gaussian << endl;
+    
+    return (error/gaussian);
 }
 
 void testSpecGmm() {
@@ -249,17 +300,18 @@ void testSpecGmm() {
     
     const bool RANDOM = true;
     
-    int nDimension = 7;
-    int nGaussian = 5;
+    int nDimension = 50;
+    int nGaussian = 10;
     int nDataPerGaussian = 1000;
     double noise = 3; //variance
     double unitRadius =10;
     
+
+        
+    
     int64 stamp1 = GetTimeMs64();
     DataGenerator data(nDimension, nGaussian, nDataPerGaussian, pow(noise,0.5), unitRadius);
-    
-    //int64 stamp2 = GetTimeMs64();
-    
+        
     if(RANDOM) {
         SpecGmm test(data.X(), nGaussian);
         data.evaluate(test.centers());
@@ -271,9 +323,67 @@ void testSpecGmm() {
 
     int64 stamp4 = GetTimeMs64();
     cout << endl;
-    //cout << "time1=" << (stamp2-stamp1)<< endl;
-    //cout << "time2=" << (stamp3-stamp2)<< endl;
     cout << "Total time=" << (stamp4-stamp1)<< endl;
-    //cout << "time4" << (stamp2-stamp1)<< endl;
+    
 }
 
+void specGmmExp() {
+    
+
+    int nDimension = 50;
+    int nGaussian = 10;
+    int nDataPerGaussian = 1000;
+   // double noise = 3; //variance
+    double unitRadius =10;
+    
+    int nRepeat = 30;
+    double rmse = 0;
+    int64 time = 0;
+    
+    //int nNoise = 6;
+    int noiseList[] = {0,3,6,9,12,15,18,21,24,27,30,-1};
+    
+    int nNoise = 0;
+    while (noiseList[nNoise] != -1) nNoise++;
+    
+    double* resultArray = new double[nNoise];
+    int64* timeArray = new int64[nNoise];
+    
+    for (int expIndex=0; expIndex<nNoise; expIndex++) {
+        
+        double noise = noiseList[expIndex];
+    
+        for (int repIndex=0; repIndex<nRepeat; repIndex++) {
+            
+            cout << "expIndex:" << expIndex <<" repIndex:" << repIndex << endl;
+        
+            int64 stamp1 = GetTimeMs64();
+            DataGenerator data(nDimension, nGaussian, nDataPerGaussian, pow(noise,0.5), unitRadius);
+        
+            SpecGmm test(data.X(), nGaussian);
+            rmse += data.evaluate(test.centers());
+        
+            int64 stamp4 = GetTimeMs64();
+            cout << endl;
+            cout << "Total time=" << (stamp4-stamp1)<< endl;
+            time += (stamp4-stamp1);
+        }
+        
+        resultArray[expIndex] = rmse/nRepeat;
+        timeArray[expIndex] = time/nRepeat;
+        
+        rmse=0;
+        time=0;
+    }
+    
+    cout << endl<<"AVG RMSE"<<endl;
+    for (int i=0; i<nNoise; i++) {
+        cout << resultArray[i] << "\t";
+    }
+    
+    cout << endl<< endl <<"AVG TIME"<<endl;
+    
+    for (int i=0; i<nNoise; i++) {
+        cout << timeArray[i] << "\t";
+    }
+}

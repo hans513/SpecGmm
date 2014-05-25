@@ -122,11 +122,7 @@ static int64 GetTimeMs64() {
 #else
     /* Linux */
     struct timeval tv;
-    void *aa=NULL;
     gettimeofday(&tv, NULL);
-    //gettimeofday(&tv, aa);
-    //int a,b;
-    //fuck(a,b);
     uint64 ret = tv.tv_usec;
     /* Convert from micro seconds (10^-6) to milliseconds (10^-3) */
     ret /= 1000;
@@ -138,6 +134,19 @@ static int64 GetTimeMs64() {
 #endif
 }
 
+static inline long
+pow2roundup (long x)
+{
+    if (x < 0)
+        return 0;
+    --x;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x+1;
+}
 
 /*
 class Test {

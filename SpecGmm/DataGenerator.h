@@ -11,8 +11,8 @@
 
 #include <random>
 #include <vector>
-#include <Eigen/Dense>
 #include <time.h>
+#include <Eigen/Dense>
 
 #endif
 
@@ -70,12 +70,12 @@ public:
         return mCenters;
     }
     
-    void evaluate(MatrixXd estimate) {
+    double evaluate(MatrixXd estimate) {
         
         if (estimate.rows()!=mCenters.rows()) {
             cout << endl <<"ERROR:DataGenerator evaluate"<< endl;
             cout << "resultEvaluation dimension mismatch "<< endl;
-            return;
+            return 0;
         }
         
         //MatrixXd finalEstimate(mDimension, mGaussian);
@@ -123,11 +123,13 @@ public:
             bestMatch.col(i) = finalEstimate.col(minRow);
         }
         
-        cout << endl <<" ===== Best match ===== " << endl;
-        cout << bestMatch << endl;
-        cout << " ===== Original ===== " << endl;
-        cout << mCenters << endl;
+        //cout << endl <<" ===== Best match ===== " << endl;
+        //cout << bestMatch << endl;
+        //cout << " ===== Original ===== " << endl;
+        //cout << mCenters << endl;
         cout << endl << "avg RMSE=" << error/mGaussian << endl;
+        
+        return (error/mGaussian);
     }
     
     
@@ -139,4 +141,5 @@ private:
     double mUnitRadius;
     MatrixXd mCenters;
     MatrixXd mX;
+    
 };
