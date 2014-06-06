@@ -37,7 +37,7 @@ class SpecGmm {
     
 public:
 
-    static const bool DBG = false;
+    static const bool DBG = true;
     static const bool TIME_MEASURE = true;
     
     void compute(MatrixXd X, unsigned long K){

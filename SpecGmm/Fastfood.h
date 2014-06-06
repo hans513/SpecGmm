@@ -3,7 +3,7 @@
 //  SpecGmm
 //
 //  Created by Huang, Tse-Han on 2014/5/18.
-//  Copyright (c) 2014年 Huang, Tse-Han. All rights reserved.
+//  Copyright (c) 2014 Huang, Tse-Han. All rights reserved.
 //
 
 #ifndef __SpecGmm__Fastfood__
@@ -24,6 +24,7 @@
 #endif /* defined(__SpecGmm__Test__) */
 
 void testHadamardGen();
+void test_FastfoodRangeFinder();
 
 class Fastfood {
 public:
@@ -37,8 +38,8 @@ public:
         
         mNumBlk = mRealRows / mRealCols;
         
-        mResidualRows = mRealRows % mRealCols;
-        mResidualCols = mBlkLength;
+        mResidualRows = (unsigned)(mRealRows % mRealCols);
+        mResidualCols = (unsigned)mBlkLength;
         
         initialize();
     }
@@ -50,7 +51,6 @@ public:
     void initialize();
     MatrixXd multiply(MatrixXd input);
     MatrixXd multiply2(MatrixXd input);
-    //static void test();
     
 private:
     // The target dimension
@@ -85,12 +85,11 @@ public:
         mFf =  Fastfood(X.cols(), target);
 
         MatrixXd Y = mFf.multiply(X);
-        MatrixXd Z = mFf.multiply2(X);
-        //MatrixXd Y = X;
-        MatrixXd diff = Y-Z;
-        cout << endl << "multiply dif" << endl<<diff.sum()<<endl;
+        //MatrixXd Z = mFf.multiply2(X);
+        //MatrixXd diff = Y-Z;
+        //cout << endl << "multiply dif" << endl<<diff.sum()<<endl;
         
-        cout << endl << "X after random ff" << endl<<Y<<endl;
+        //cout << endl << "X after random ff" << endl<<Y<<endl;
         //MatrixXd Y;
         //mFf.multiply(X, Y);
         
@@ -98,7 +97,7 @@ public:
         mQ = MatrixXd::Identity(X.rows(),target);
         mQ = qr.householderQ() * mQ;
         
-         cout << endl << "Q:" << endl<< mQ <<endl;
+        //cout << endl << "Q:" << endl<< mQ <<endl;
     }
 
     MatrixXd Q() {
@@ -109,7 +108,6 @@ private:
     Fastfood mFf;
     MatrixXd mQ;
     //MatrixXd mR;
-    
 };
 
 

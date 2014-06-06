@@ -35,6 +35,8 @@
 		3A3CD3FF1927F2ED00554F9E /* DataGenerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataGenerator.h; sourceTree = "<group>"; };
 		3A3CD400192938C700554F9E /* Fastfood.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Fastfood.cpp; sourceTree = "<group>"; };
 		3A3CD401192938C700554F9E /* Fastfood.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Fastfood.h; sourceTree = "<group>"; };
+		3A5EBD1A193280FF00343D21 /* SpecGmmRandomize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpecGmmRandomize.h; sourceTree = SOURCE_ROOT; };
+		3A5EBD1B1932976C00343D21 /* GaussianData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GaussianData.h; sourceTree = "<group>"; };
 		3AB535401916B76000D5344B /* SpecGmm */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SpecGmm; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AB535431916B76000D5344B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3AB535451916B76000D5344B /* SpecGmm.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SpecGmm.1; sourceTree = "<group>"; };
@@ -77,9 +79,11 @@
 				3A3CD3F9191DA49E00554F9E /* Test.h */,
 				3A3CD3FC191DDDE900554F9E /* TensorPower.h */,
 				3A3CD3FE191FFFF400554F9E /* SpecGmm.h */,
+				3A5EBD1A193280FF00343D21 /* SpecGmmRandomize.h */,
 				3A3CD3FF1927F2ED00554F9E /* DataGenerator.h */,
 				3A3CD400192938C700554F9E /* Fastfood.cpp */,
 				3A3CD401192938C700554F9E /* Fastfood.h */,
+				3A5EBD1B1932976C00343D21 /* GaussianData.h */,
 			);
 			path = SpecGmm;
 			sourceTree = "<group>";
@@ -219,8 +223,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"/Users/hans/Box Documents/Research/eigenImpl/Eigen\"/**",
 					"\"/Users/hans/Box Documents/Research/eigenImpl/spiral-wht-1.8\"/**",
+					"\"/Users/hans/eigen\"/**",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -233,8 +237,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"/Users/hans/Box Documents/Research/eigenImpl/Eigen\"/**",
 					"\"/Users/hans/Box Documents/Research/eigenImpl/spiral-wht-1.8\"/**",
+					"\"/Users/hans/eigen\"/**",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

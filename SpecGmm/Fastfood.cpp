@@ -8,7 +8,7 @@
 
 
 #include "Fastfood.h"
-#include "spiral_wht.h"
+//#include "spiral_wht.h"
 
 
 MatrixXi hadamardGenerator(long length) {
@@ -36,6 +36,36 @@ void testHadamardGen() {
     cout << endl << "hadamard 8" << endl << hadamardGenerator(8) << endl;
 }
 
+//  Test case for FastfoodRangeFinder
+void test_FastfoodRangeFinder() {
+    unsigned ndimension = 18;
+    unsigned nbasis = 6;
+    unsigned ndataPoints = 40;
+    
+    // Random basis
+    MatrixXd basis = MatrixXd::Random(ndimension, nbasis);
+    
+    // nDimension * nDataPoints (rank=nBasis)
+    MatrixXd span = basis * MatrixXd::Random(nbasis, ndataPoints);
+    
+    FastfoodRangeFinder ffFinder(span, nbasis);
+    
+    unsigned rankDiff = 0;
+    
+    // Check if all the column vectors in the matrix q we got are linear dependent
+    // with the Basis we have above.
+    for (int i=0; i<nbasis; i++) {
+        MatrixXd test(ndimension, nbasis+1);
+        test << ffFinder.Q(), basis.col(i);
+        
+        FullPivLU<MatrixXd> lu(test);
+        lu.setThreshold(pow(10,-10));
+        rankDiff += (lu.rank()-nbasis);
+        cout << endl << "threshold:" << lu.threshold() << endl;
+    }
+    
+    cout << endl << "Rank diff:" << rankDiff << endl;
+}
 
 
 void Fastfood::initialize() {
@@ -106,7 +136,6 @@ MatrixXd Fastfood::multiply(MatrixXd input) {
         // The fastfood matrix
         MatrixXd F =  H * G * PI.cast<double>() * H * B.cast<double>();
         
-        cout << endl << "ff F:" << F << endl;
         // Extract the correspondent block in the X
         MatrixXd inputBlock = input.middleCols(i * mBlkLength, mBlkLength);
         
