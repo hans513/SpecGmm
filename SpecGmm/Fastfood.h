@@ -20,7 +20,7 @@
 #endif /* defined(__SpecGmm__Fastfood__) */
 
 #ifndef __SpecGmm__Test__
-#include "test.h"
+#include "Test.h"
 #endif /* defined(__SpecGmm__Test__) */
 
 void testHadamardGen();

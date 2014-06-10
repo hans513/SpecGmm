@@ -19,7 +19,7 @@
 #endif /* defined(__SpecGmm__D3Matrix__) */
 
 #ifndef __SpecGmm__Test__
-#include "test.h"
+#include "Test.h"
 #endif /* defined(__SpecGmm__Test__) */
 
 #ifndef __SpecGmm__TesnsorPower__
@@ -42,9 +42,6 @@
 #include "SpecGmmRandomize.h"
 #endif
 
-#ifndef SpecGmm_GaussianData_h
-#include "GaussianData.h"
-#endif
 
 using namespace std;
 using namespace Eigen;
