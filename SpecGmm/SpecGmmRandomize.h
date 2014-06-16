@@ -193,7 +193,7 @@ public:
         mWeight.clear();
         for (int i=0; i<centers.size(); i++) {
             centerMatrix.col(i) = centers.at(i).col(0);
-            cout << pow(lambda.at(i),-2) <<"\t";
+            if (DBG) cout << pow(lambda.at(i),-2) <<"\t";
             mWeight.push_back(pow(lambda.at(i),-2));
         }
         if(DBG) cout << endl <<"centers ="<<endl<< centerMatrix << endl;
