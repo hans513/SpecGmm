@@ -187,13 +187,12 @@ void testSpecGmm() {
         SpecGmmRandomize test(data.X(), nGaussian);
         data.evaluate(test.centers());
     }
-    /*
     else {
-        GaussianData data;
-        SpecGmm test(data.Data5_90, nGaussian);
-        evaluate(data.Data5_90_center, test.centers());
+
+        SpecGmm test(data.X(), nGaussian);
+        data.evaluate(test.centers());
     }
-     */
+    
 
     int64 stamp4 = GetTimeMs64();
     cout << endl;

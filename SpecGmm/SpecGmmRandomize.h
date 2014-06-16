@@ -42,7 +42,7 @@ class SpecGmmRandomize {
     
 public:
     
-    static const bool DBG = true;
+    static const bool DBG = false;
     static const bool TIME_MEASURE = true;
     
     void compute(MatrixXd X, unsigned long K){
@@ -177,8 +177,6 @@ public:
             T = *current.deflate();
             theta.push_back(current.theta());
             lambda.push_back(current.lambda());
-            //cout << endl <<"theta="<<endl<<current.theta();
-            //cout << endl <<"lambda="<<endl<<current.lambda();
             
             // Recover the center
             const JacobiSVD<MatrixXd> pinvSvd(W.transpose(), ComputeThinU | ComputeThinV);
@@ -203,13 +201,8 @@ public:
     }
     
     MatrixXd centers() {
-        
         if (mK >= mCenters.cols()) return mCenters;
         return  mCenters.leftCols(mK);
-        
-        //cout << endl <<"mK =" << mK << endl;
-        //cout << endl <<"mCenters col =" << mCenters.cols() << endl;
-        //return mCenters.leftCols(mK);
     }
     
 private:
