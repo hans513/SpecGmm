@@ -179,7 +179,7 @@ void testSpecGmm() {
     int nDimension = 50;
     int nGaussian = 10;
     int nDataPerGaussian = 1000;
-    double noise = 5; //variance
+    double noise = 1; //variance
     double unitRadius =10;
     
     int64 stamp1 = GetTimeMs64();
