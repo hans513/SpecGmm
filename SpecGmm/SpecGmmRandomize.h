@@ -188,15 +188,15 @@ public:
         
         // Print out the result
         MatrixXd centerMatrix(W.rows(), lambda.size());
-        cout << endl <<"TensorDecompose result =" << endl;
-        cout << "lambda =" << endl << "\t";
+        if (DBG) cout << endl <<"TensorDecompose result =" << endl;
+        if (DBG) cout << "lambda =" << endl << "\t";
         mWeight.clear();
         for (int i=0; i<centers.size(); i++) {
             centerMatrix.col(i) = centers.at(i).col(0);
             cout << pow(lambda.at(i),-2) <<"\t";
             mWeight.push_back(pow(lambda.at(i),-2));
         }
-        cout << endl <<"centers ="<<endl<< centerMatrix << endl;
+        if(DBG) cout << endl <<"centers ="<<endl<< centerMatrix << endl;
         mCenters = centerMatrix;
     }
     
