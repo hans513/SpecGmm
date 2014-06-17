@@ -44,8 +44,6 @@ public:
             return zero;
         }
         
-         cout << "\nD3<Matrix getLayer error  layer="<<layer<< "  max layer=" << nLayer << "  layerVec size:" << mlayerVec.size()<< endl;
-        
         return mlayerVec.at(layer);
     };
     
