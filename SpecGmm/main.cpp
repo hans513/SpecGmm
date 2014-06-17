@@ -174,29 +174,63 @@ void testSpecGmm() {
     const bool RANDOM = true;
     
     int nDimension = 50;
-    int nGaussian = 10;
-    int nDataPerGaussian = 1000;
+    int nCluster = 10;
+    int nDataPerCluster = 1000;
     double noise = 1; //variance
     double unitRadius =10;
+    int nRepeat = 10;
     
-    int64 stamp1 = GetTimeMs64();
-    DataGenerator data(nDimension, nGaussian, nDataPerGaussian, pow(noise,0.5), unitRadius);
+    string strDefault;
+    cout << endl << "Use default settings? [y/n] (default y):";
+    getline(cin, strDefault);
+    
+    // User want to input new Settings
+    if (!strDefault.compare("n")) {
+        cout << endl << "Dimension:";
+        cin >> nDimension;
+        cout << endl << "Number of clusters:";
+        cin >> nCluster;
+        cout << endl << "Number of data per cluster:";
+        cin >> nDataPerCluster;
+        cout << endl << "Number of repeat:";
+        cin >> nRepeat;
+    }
+    
+    vector<int64> timeHistory;
+    
+    for (int repInd=0; repInd<nRepeat; repInd++) {
+
+        int64 stamp1 = GetTimeMs64();
+        DataGenerator data(nDimension, nCluster, nDataPerCluster, pow(noise,0.5), unitRadius);
         
-    if(RANDOM) {
-        //SpecGmm test(data.X(), nGaussian);
-        SpecGmmRandomize test(data.X(), nGaussian);
-        data.evaluate(test.centers());
-    }
-    else {
-
-        SpecGmm test(data.X(), nGaussian);
-        data.evaluate(test.centers());
+        if(RANDOM) {
+            //SpecGmm test(data.X(), nGaussian);
+            SpecGmmRandomize test(data.X(), nCluster);
+            data.evaluate(test.centers());
+        }
+        else {
+            
+            SpecGmm test(data.X(), nCluster);
+            data.evaluate(test.centers());
+        }
+        
+        int64 stamp4 = GetTimeMs64();
+        cout << endl;
+        cout << "Total time=" << (stamp4-stamp1) << endl;
+        timeHistory.push_back(stamp4-stamp1);
     }
     
+    float average=0;
+    for (int i=0; i<timeHistory.size(); i++) {
+        cout << endl << "Trail " << i << "\tTime:\t" << timeHistory.at(i);
+        average += timeHistory.at(i);
+    }
 
-    int64 stamp4 = GetTimeMs64();
-    cout << endl;
-    cout << "Total time=" << (stamp4-stamp1)<< endl;
+     cout << endl << "Average :\t" << average/timeHistory.size();
+    
+}
+
+void timeEvaluation() {
     
 }
 
