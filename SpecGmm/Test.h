@@ -34,7 +34,7 @@ typedef uint64_t     uint64;
 using namespace Eigen;
 
 template <typename Derived>
-static D3Matrix<Derived>* outer(const MatrixBase<Derived> &A, MatrixBase<Derived> &B) {
+static D3Matrix<Derived> outer(const MatrixBase<Derived> &A, MatrixBase<Derived> &B) {
     
     MatrixXd m = kroneckerProduct(A,B).eval();
     
@@ -54,14 +54,14 @@ static D3Matrix<Derived>* outer(const MatrixBase<Derived> &A, MatrixBase<Derived
         size[2] = 1;
     }
     
-    D3Matrix<MatrixXd> *ret = new D3Matrix<MatrixXd>(size[0], size[1], size[2]);
+    D3Matrix<MatrixXd> ret(size[0], size[1], size[2]);
     
     long layerSize = size[0] * size[1];
     long colNeed = layerSize/m.rows();
     
     MatrixXd layer0 = m.leftCols(colNeed);
     layer0.resize(size[0],size[1]);
-    ret->setLayer(0, layer0);
+    ret.setLayer(0, layer0);
     
     if (index < 3)  return ret;
         
@@ -69,7 +69,7 @@ static D3Matrix<Derived>* outer(const MatrixBase<Derived> &A, MatrixBase<Derived
     for (unsigned long colInd=colNeed; colInd<m.cols(); colInd+=colNeed) {
         MatrixXd temp  = m.middleCols(colInd, colNeed);
         temp.resize(size[0],size[1]);
-        ret->setLayer(i++, temp);
+        ret.setLayer(i++, temp);
     }
 
     return ret;
@@ -84,7 +84,7 @@ static void testOuter() {
     t1 << 1,2,3,4,5,6,7,8,9;
     t2 << 1,2,3;
     
-    D3Matrix<MatrixXd> result = *outer(t1, t2);
+    D3Matrix<MatrixXd> result = outer(t1, t2);
     
     MatrixXd sol0(3,3);
     MatrixXd sol1(3,3);

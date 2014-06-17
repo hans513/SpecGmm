@@ -102,8 +102,8 @@ public:
         D3Matrix<MatrixXd> EWtX3(K,K,K);
         for (int i=0; i<nData; i++) {
             MatrixXd temp = W.transpose() * X.col(i);
-            MatrixXd temp2 = outer(temp,temp)->getLayer(0);
-            EWtX3 += *outer(temp2, temp);
+            MatrixXd temp2 = outer(temp,temp).getLayer(0);
+            EWtX3 += outer(temp2, temp);
         }
         
         int64 t3 = GetTimeMs64();
@@ -132,12 +132,12 @@ public:
             ei(i,0) = 1;
             
             MatrixXd WtEi = W.transpose()*ei;
-            MatrixXd temp1 = outer(EWtX,  WtEi)->getLayer(0);
-            MatrixXd temp2 = outer(WtEi, EWtX)->getLayer(0);
-            MatrixXd temp3 = outer(WtEi, WtEi)->getLayer(0);
-            sigTensor +=   *outer(temp1, WtEi);
-            sigTensor +=   *outer(temp2, WtEi);
-            sigTensor +=   *outer(temp3, EWtX);
+            MatrixXd temp1 = outer(EWtX,  WtEi).getLayer(0);
+            MatrixXd temp2 = outer(WtEi, EWtX).getLayer(0);
+            MatrixXd temp3 = outer(WtEi, WtEi).getLayer(0);
+            sigTensor +=   outer(temp1, WtEi);
+            sigTensor +=   outer(temp2, WtEi);
+            sigTensor +=   outer(temp3, EWtX);
         }
         
         sigTensor = sigTensor*sigma;
@@ -174,7 +174,7 @@ public:
         
         while (lambda.size()==0  || abs(lambda.back())>0.01 ) {
             TensorPower<MatrixXd> current(T, 10, 10);
-            T = *current.deflate();
+            T = current.deflate();
             theta.push_back(current.theta());
             lambda.push_back(current.lambda());
             

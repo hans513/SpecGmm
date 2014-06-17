@@ -250,17 +250,21 @@ public:
         bestTheta = best;
         bestLambda = lambda(0,0);
         
-        MatrixXd temp = outer(bestTheta, bestTheta)->getLayer(0);
-        D3Matrix<MatrixXd> tt = T - *outer(temp, bestTheta)*bestLambda;
-        deflateT = &tt;
+        MatrixXd temp = outer(bestTheta, bestTheta).getLayer(0);
+        
+        D3Matrix<MatrixXd> ttemp = outer(temp, bestTheta);
+        
+        D3Matrix<MatrixXd> tt = T - ttemp*bestLambda;
+        deflateT = tt;
         //*deflateT = T - (*outer(temp, bestTheta)*bestLambda);
       
 
     }
 
-    TensorPower (D3Matrix<Derived> &T, int L, int N) {
+    TensorPower (D3Matrix<Derived> &T, int L, int N):deflateT(T.rows(),T.cols(),T.layers())
+    {
         
-        //deflateT = new D3Matrix<MatrixXd>(T.rows(),T.cols(),T.layers());
+        
         compute (T, L, N);
     }
     
@@ -277,14 +281,14 @@ public:
         return bestLambda;
     }
     
-    D3Matrix<MatrixXd>* deflate() {
+    D3Matrix<MatrixXd> deflate() {
         return deflateT;
     }
 
 private:
     MatrixXd bestTheta;
     double bestLambda;
-    D3Matrix<MatrixXd>* deflateT;
+    D3Matrix<MatrixXd> deflateT;
 };
 
 

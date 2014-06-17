@@ -9,6 +9,7 @@
 #ifndef __SpecGmm__D3Matrix__
 #define __SpecGmm__D3Matrix__
 
+#include <vector>
 #include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -25,15 +26,15 @@ public:
     
     D3Matrix(long row, long col, long layer) : nRow(row), nCol(col), nLayer(layer) {
 
-        layerPtr = new MatrixXd[nLayer];
+        //layer = new MatrixXd[nLayer];
         
         for (long i=0; i<nLayer; i++) {
-            layerPtr[i] =  MatrixXd::Zero(nRow,nCol);
+            mlayerVec.push_back(MatrixXd::Zero(nRow,nCol));
         }
     }
     
     ~D3Matrix() {
-        
+     
     }
     
     MatrixXd getLayer(unsigned long layer) const {
@@ -42,13 +43,16 @@ public:
             MatrixXd zero = MatrixXd::Zero(nRow,nCol);
             return zero;
         }
-        return layerPtr[layer];
+        
+         cout << "\nD3<Matrix getLayer error  layer="<<layer<< "  max layer=" << nLayer << "  layerVec size:" << mlayerVec.size()<< endl;
+        
+        return mlayerVec.at(layer);
     };
     
     
     bool setLayer(unsigned long layer, MatrixBase<Derived> &matrix){
         if (layer>=nLayer) return false;
-        layerPtr[layer] = matrix;
+        mlayerVec.at(layer) = matrix;
         return true;
     };
     
@@ -62,7 +66,7 @@ public:
     
     void print() {
         for (long i=0; i<nLayer; i++) {
-            MatrixXd temp =layerPtr[i];
+            MatrixXd temp =mlayerVec[i];
             cout << "D3Matrix layer"<< i << "=>\n"<<  temp <<endl;
             
         }
@@ -76,7 +80,7 @@ public:
         }
         
         for (int i=0; i<nLayer; i++) {
-            layerPtr[i] += rhs.getLayer(i);
+            mlayerVec[i] += rhs.getLayer(i);
         }
         
         return *this;
@@ -85,7 +89,10 @@ public:
 
 private:
     // Array of MatrixXd
-    MatrixXd *layerPtr;
+    //MatrixXd *layer;
+    
+    vector<MatrixXd> mlayerVec;
+    
     long nRow;
     long nCol;
     long nLayer;
