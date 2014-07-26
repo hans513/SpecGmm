@@ -8,4 +8,4 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 main: main.cpp D3Matrix.cpp Fastfood.cpp
-	g++ -I $(EIGEN) -I $(EIGEN)/unsupported -std=c++11 -o specGmm main.cpp D3Matrix.cpp Fastfood.cpp
+	g++ -I $(EIGEN) -I $(EIGEN)/unsupported -std=c++11 -O3 -o specGmm main.cpp D3Matrix.cpp Fastfood.cpp
