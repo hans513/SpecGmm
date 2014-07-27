@@ -11,6 +11,7 @@
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 #include <Eigen/Core>
+#include <thread>
 //#include <Eigen/KroneckerProduct>
 //#include <spiral_wht.h>
 
@@ -58,6 +59,15 @@ void test() {
     
 }
 
+void f1(int n)
+{
+        for (int i = 0; i < 5000; ++i) {
+                    std::cout << "Thread 1 executing\n";
+                            ++n;
+                                    this_thread::sleep_for(std::chrono::milliseconds(10));
+                                        }
+}
+
 
 int main(int argc, const char * argv[]) {
 
@@ -67,7 +77,8 @@ int main(int argc, const char * argv[]) {
 
     //test();
     //Fastfood::test();
-    
+ 
+    thread t2(f1,1);
     testSpecGmm();
     //specGmmExp();
     //testHadamardGen();            // in Fastfood.h
